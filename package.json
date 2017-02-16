@@ -1,20 +1,20 @@
 {
-  "name": "node-demo",
+  "name": "analytics-service-node-skeleton",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/babel/bin/babel.js src --source-maps --out-dir dist",
-    "start": "node_modules/nodemon/bin/nodemon.js -- node_modules/babel/bin/babel-node.js src/server.js"
+    "start": "node server.js",
+    "test": "node_modules/.bin/mocha tests/**"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "express": "4.13.3"
+    "body-parser": "^1.12.3",
+    "express": "^4.12.3",
+    "jade": "^1.9.2"
   },
   "devDependencies": {
-    "babel": "5.8.29",
-    "nodemon": "1.8.0"
+    "mocha": "^2.2.4",
+    "should": "^6.0.1"
   }
 }
