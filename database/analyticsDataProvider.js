@@ -8,7 +8,7 @@ analyticsDataProvider.get = function(cb) {
         host     : 'mysql-test.playbuzz.com',
         user     : 'root',
         password : 'Sharona12#',
-        database : 'analytics'
+        database : 'analytics' // IMPORTANT! : please create your own new database, this is for example only
     });
 
     connection.connect();
