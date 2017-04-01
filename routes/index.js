@@ -1,10 +1,20 @@
-var express = require('express')
-var router = express.Router()
+'use strict';
 
-router.use('/controller', require('../controllers/controller'))
+let express = require('express')
+  , router = express.Router()
+  , Controller = require('../controllers/controller')
+  ;
 
-router.get('/', function(req, res) {
-  res.send({ status : "OK"})
-})
+let appRouter = function(options) {
+  let controller = new Controller(options);
 
-module.exports = router
+  router.use('/controller', (controller.getRouter()).bind(controller));
+
+  router.get('/', function(req, res) {
+    res.send({ status : "OK"})
+  });
+
+  return router;
+};
+
+module.exports = appRouter;

@@ -1,30 +1,69 @@
-var mysql      = require('mysql');
+'use strict';
 
-var analyticsDataProvider = {};
+const mysql = require('mysql')
+  , Promise = require('promise');
 
-analyticsDataProvider.get = function(cb) {
+let analyticsDataProvider = function(options) {
 
-    var connection = mysql.createConnection({
-        host     : 'mysql-test.playbuzz.com',
-        user     : 'root',
-        password : 'Sharona12#',
-        database : 'analytics' // IMPORTANT! : please create your own new database, this is for example only
-    });
+  return {
+    collectView: collectView,
+    getPageViews: getPageViews
+  };
 
-    connection.connect();
+  function collectView (viewData) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection(options.mySQL);
+      connection.connect();
 
-    connection.query("select col_2 from demo_events_table where col_1 = 'key'", function(err, rows, fields) {
+      connection.query("insert into events set ?", viewData, function(err) {
 
         if (!err) {
-            cb(rows[0]['col_2'])
-            // console.log('data recived is: ', rows);
+          return resolve({message: 'Data successfully collected.'})
         }
-        else
-            console.log('Error while performing Query.');
+        else {
+          return reject({message: 'Error while performing Query.', err});
+          // err is for debug only, do not use this test code for production.
+        }
 
+      });
+
+      connection.end();
     });
+  }
 
-    connection.end();
-}
+  function getPageViews (config) {
+    let queryString;
 
-module.exports = analyticsDataProvider
+    return new Promise((resolve, reject) => {
+
+      if (config.value) {
+        queryString = `SELECT COUNT(*) as count FROM events WHERE ${config.field} = '${config.value}'`
+      }
+      else {
+        queryString = `SELECT COUNT(*) as count,${config.field} FROM analytics_task.events GROUP BY ${config.field} ORDER BY 1 DESC`;
+        if(config.limit) {
+          queryString += ` LIMIT ${config.limit}`
+        }
+      }
+
+      const connection = mysql.createConnection(options.mySQL);
+      connection.connect();
+
+      connection.query(queryString, function(err, rows, fields) {
+
+        if (!err) {
+          return resolve(rows.length > 1 ? rows : rows[0])
+        }
+        else {
+          return reject({message: 'Error while performing Query.'});
+        }
+
+      });
+
+      connection.end();
+    });
+  }
+
+};
+
+module.exports = analyticsDataProvider;
